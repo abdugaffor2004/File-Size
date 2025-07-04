@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"strconv"
 )
 
 var BaseBinary = 1024
@@ -21,17 +20,12 @@ type Options struct {
 }
 
 func main() {
-	fmt.Println(FormatWithOptions(math.MinInt64, Options{Base: BaseBinary, Format: FormatIEC, Precision: 0}))
-
+	fmt.Println(FormatWithOptions(1000000000000, Options{Base: BaseBinary, Format: FormatStandart, Precision: 0}))
 }
 
 func FormatWithOptions(bytes int64, opts Options) string {
 	fbytes := float64(bytes)
 	pow := math.Floor(math.Log2(math.Abs(fbytes)) / 10)
-
-	if opts.Precision == 0 {
-		opts.Precision = DefaultPrecision
-	}
 
 	if opts.Separator == "" {
 		opts.Separator = DefaultSeparator
@@ -42,8 +36,10 @@ func FormatWithOptions(bytes int64, opts Options) string {
 	}
 
 	converted := fbytes / math.Pow(float64(opts.Base), pow)
+	cutted := fmt.Sprint(toFixed(converted, opts.Precision))
+	unit := determineMesureUnit(pow, opts.Format, opts.Base)
 
-	return strconv.FormatFloat(converted, 'b', opts.Precision, 64) + opts.Separator + determineMesureUnit(pow, opts.Format, opts.Base)
+	return cutted + opts.Separator + unit
 }
 
 func determineMesureUnit(pow float64, format string, base int) string {
@@ -68,21 +64,22 @@ func determineMesureUnit(pow float64, format string, base int) string {
 	}
 
 	if format == FormatIEC {
-
 		return iecSuffix(stdSuffix, base)
 	}
 
 	return stdSuffix
-
 }
 
 func iecSuffix(sf string, base int) string {
-
-	if base == BaseDecimal {
+	if base == BaseDecimal || sf == "B" {
 		return sf
 	}
 
 	return sf[:1] + "i" + sf[1:2]
 }
 
+func toFixed(n float64, precision int) float64 {
+	scale := math.Pow(10, float64(precision))
 
+	return math.Round(n*scale) / scale
+}
