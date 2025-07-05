@@ -20,26 +20,35 @@ type Options struct {
 }
 
 func main() {
-	fmt.Println(FormatWithOptions(1000000000000, Options{Base: BaseBinary, Format: FormatStandart, Precision: 0}))
+	// fmt.Println(FormatWithOptions(1536, Options{Base: BaseBinary, Format: FormatIEC, Precision: 2}))
+	fmt.Println(Format(-1024))
+}
+
+func Format(bytes int64) string {
+	return FormatWithOptions(bytes, Options{Base: 1024, Precision: 1, Format: FormatIEC})
 }
 
 func FormatWithOptions(bytes int64, opts Options) string {
 	fbytes := float64(bytes)
 	pow := math.Floor(math.Log2(math.Abs(fbytes)) / 10)
-
-	if opts.Separator == "" {
-		opts.Separator = DefaultSeparator
-	}
+	unit := determineMesureUnit(pow, opts.Format, opts.Base)
 
 	if opts.Base == BaseDecimal {
 		pow = math.Floor(math.Log10(math.Abs(fbytes)) / 3)
 	}
 
 	converted := fbytes / math.Pow(float64(opts.Base), pow)
-	cutted := fmt.Sprint(toFixed(converted, opts.Precision))
-	unit := determineMesureUnit(pow, opts.Format, opts.Base)
+	formatted := fmt.Sprint(toFixed(converted, opts.Precision))
 
-	return cutted + opts.Separator + unit
+	if opts.Separator == "" {
+		opts.Separator = DefaultSeparator
+	}
+
+	if bytes == 0 {
+		formatted = "0"
+	}
+
+	return formatted + opts.Separator + unit
 }
 
 func determineMesureUnit(pow float64, format string, base int) string {
