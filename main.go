@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"strconv"
 )
 
 var BaseBinary = 1024
@@ -20,8 +21,7 @@ type Options struct {
 }
 
 func main() {
-	// fmt.Println(FormatWithOptions(1536, Options{Base: BaseBinary, Format: FormatIEC, Precision: 2}))
-	fmt.Println(Format(-1024))
+	fmt.Println(FormatWithOptions(1536, Options{Separator: ""}))
 }
 
 func Format(bytes int64) string {
@@ -29,24 +29,32 @@ func Format(bytes int64) string {
 }
 
 func FormatWithOptions(bytes int64, opts Options) string {
+	if bytes == 0 {
+		return "0" + DefaultSeparator + "B"
+	}
+
 	fbytes := float64(bytes)
 	pow := math.Floor(math.Log2(math.Abs(fbytes)) / 10)
-	unit := determineMesureUnit(pow, opts.Format, opts.Base)
+
+	if opts.Separator == "" {
+		opts.Separator = DefaultSeparator
+	}
+
+	if opts.Format == "" {
+		opts.Format = FormatIEC
+	}
+
+	if opts.Base == 0 {
+		opts.Base = BaseBinary
+	}
 
 	if opts.Base == BaseDecimal {
 		pow = math.Floor(math.Log10(math.Abs(fbytes)) / 3)
 	}
 
 	converted := fbytes / math.Pow(float64(opts.Base), pow)
-	formatted := fmt.Sprint(toFixed(converted, opts.Precision))
-
-	if opts.Separator == "" {
-		opts.Separator = DefaultSeparator
-	}
-
-	if bytes == 0 {
-		formatted = "0"
-	}
+	formatted := toFixed(converted, opts.Precision)
+	unit := determineMesureUnit(pow, opts.Format, opts.Base)
 
 	return formatted + opts.Separator + unit
 }
@@ -87,8 +95,11 @@ func iecSuffix(sf string, base int) string {
 	return sf[:1] + "i" + sf[1:2]
 }
 
-func toFixed(n float64, precision int) float64 {
-	scale := math.Pow(10, float64(precision))
+func toFixed(n float64, precision int) string {
+	if n == math.Trunc(n) || precision == 0 {
+		return fmt.Sprintf("%.0f", n)
+	}
 
-	return math.Round(n*scale) / scale
+	format := "%." + strconv.Itoa(precision) + "f"
+	return fmt.Sprintf(format, n)
 }
