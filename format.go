@@ -1,10 +1,12 @@
-package main
+package filesize
 
 import (
 	"fmt"
 	"math"
 	"strconv"
 )
+
+var units = []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 
 var BaseBinary = 1024
 var BaseDecimal = 1000
@@ -20,10 +22,6 @@ type Options struct {
 	Format    string
 }
 
-func main() {
-	fmt.Println(FormatWithOptions(1536, Options{Separator: ""}))
-}
-
 func Format(bytes int64) string {
 	return FormatWithOptions(bytes, Options{Base: 1024, Precision: 1, Format: FormatIEC})
 }
@@ -33,8 +31,8 @@ func FormatWithOptions(bytes int64, opts Options) string {
 		return "0" + DefaultSeparator + "B"
 	}
 
-	fbytes := float64(bytes)
-	pow := math.Floor(math.Log2(math.Abs(fbytes)) / 10)
+	rawBytes := float64(bytes)
+	pow := math.Floor(math.Log2(math.Abs(rawBytes)) / 10)
 
 	if opts.Separator == "" {
 		opts.Separator = DefaultSeparator
@@ -49,36 +47,18 @@ func FormatWithOptions(bytes int64, opts Options) string {
 	}
 
 	if opts.Base == BaseDecimal {
-		pow = math.Floor(math.Log10(math.Abs(fbytes)) / 3)
+		pow = math.Floor(math.Log10(math.Abs(rawBytes)) / 3)
 	}
 
-	converted := fbytes / math.Pow(float64(opts.Base), pow)
-	formatted := toFixed(converted, opts.Precision)
+	converted := rawBytes / math.Pow(float64(opts.Base), pow)
+	precised := toFixed(converted, opts.Precision)
 	unit := determineMesureUnit(pow, opts.Format, opts.Base)
 
-	return formatted + opts.Separator + unit
+	return precised + opts.Separator + unit
 }
 
 func determineMesureUnit(pow float64, format string, base int) string {
-	var stdSuffix string
-
-	switch pow {
-	case 1:
-		stdSuffix = "KB"
-	case 2:
-		stdSuffix = "MB"
-	case 3:
-		stdSuffix = "GB"
-	case 4:
-		stdSuffix = "TB"
-	case 5:
-		stdSuffix = "PB"
-	case 6:
-		stdSuffix = "EB"
-
-	default:
-		stdSuffix = "B"
-	}
+	stdSuffix := units[int(pow)]
 
 	if format == FormatIEC {
 		return iecSuffix(stdSuffix, base)
@@ -99,7 +79,7 @@ func toFixed(n float64, precision int) string {
 	if n == math.Trunc(n) || precision == 0 {
 		return fmt.Sprintf("%.0f", n)
 	}
-
 	format := "%." + strconv.Itoa(precision) + "f"
+
 	return fmt.Sprintf(format, n)
 }
