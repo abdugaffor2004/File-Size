@@ -8,24 +8,46 @@ import (
 
 var units = []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 
+// BaseBinary base used for binary-based units like KiB, MiB
 var BaseBinary = 1024
+
+// BaseDecimal base used for decimal-based units like KB, MB
 var BaseDecimal = 1000
+
+// FormatStandart windows-like standard format using decimal-based units (e.g., KB, MB)
 var FormatStandart = "standart"
+
+// FormatIEC IEC format binary-based format (e.g., KiB, MiB) and decimal-based (e.g., KB, MB)
 var FormatIEC = "IEC"
+
+// DefaultPrecision default number of decimal places used in formatting
 var DefaultPrecision = 1
+
+// DefaultSeparator default separator between value and unit
 var DefaultSeparator = " "
 
+// Options struct allows customizing the behavior of FormatWithOptions function.
 type Options struct {
-	Base      int
+	//Base base for conversion: 1024 or 1000
+	Base int
+
+	// Precision number of decimal places to show
 	Precision int
+
+	// Seperator character(s) used seperate number and unit
 	Separator string
-	Format    string
+
+	// Format output in standart or IEC format
+	Format string
 }
 
+// Format converts a given number of bytes into a human-readable string using default options.
 func Format(bytes int64) string {
 	return FormatWithOptions(bytes, Options{Base: 1024, Precision: 1, Format: FormatIEC})
 }
 
+// FormatWithOptions converts a given number of bytes into a human-readable string using custom options.
+// Supports different bases (1024/1000), precision levels, separators, and output formats.
 func FormatWithOptions(bytes int64, opts Options) string {
 	if bytes == 0 {
 		return "0" + DefaultSeparator + "B"

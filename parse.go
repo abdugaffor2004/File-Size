@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+// Parse converts a human-readable string (e.g., "1.5 KiB") into the corresponding number of bytes.
+// Supports both IEC (KiB, MiB) and SI (KB, MB) formats with appropriate bases.
+// Returns an error if input is invalid or cannot be parsed.
 func Parse(s string) (int, error) {
 	var rawBytes int
 	prepared := strings.ToUpper(strings.TrimSpace(s))
