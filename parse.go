@@ -22,13 +22,13 @@ func Parse(s string) (int64, error) {
 		return bytes, nil
 	}
 
-	for i, sfx := range units[1:] {
+	for i, sfx := range stdUnits[1:] {
 		if stdCutted, ok := strings.CutSuffix(prepared, sfx); ok {
 			rawBytes = calcRawBytes(stdCutted, i+1)
 			break
 		}
 
-		if iecCutted, ok := strings.CutSuffix(prepared, strings.ToUpper(iecSuffix(sfx, BaseBinary))); ok {
+		if iecCutted, ok := strings.CutSuffix(prepared, strings.ToUpper(iecSuffix(sfx, BaseBinary, i+1))); ok {
 			rawBytes = calcRawBytes(iecCutted, i+1)
 			break
 		}

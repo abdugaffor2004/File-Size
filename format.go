@@ -6,26 +6,6 @@ import (
 	"strconv"
 )
 
-var units = []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
-
-// BaseBinary base used for binary-based units like KiB, MiB
-var BaseBinary uint = 1024
-
-// BaseDecimal base used for decimal-based units like KB, MB
-var BaseDecimal uint = 1000
-
-// FormatStandart windows-like standard format using decimal-based units (e.g., KB, MB)
-var FormatStandart = "standart"
-
-// FormatIEC IEC format binary-based format (e.g., KiB, MiB) and decimal-based (e.g., KB, MB)
-var FormatIEC = "IEC"
-
-// DefaultPrecision default number of decimal places used in formatting
-var DefaultPrecision uint = 1
-
-// DefaultSeparator default separator between value and unit
-var DefaultSeparator = " "
-
 // Options struct allows customizing the behavior of FormatWithOptions function.
 type Options struct {
 	//Base base for conversion: 1024 or 1000
@@ -50,15 +30,11 @@ func Format(bytes int64) string {
 // Supports different bases (1024/1000), precision levels, separators, and output formats.
 func FormatWithOptions(bytes int64, opts Options) string {
 	if bytes == 0 {
-		return "0" + DefaultSeparator + "B"
+		return "0" + opts.Separator + "B"
 	}
 
 	rawBytes := float64(bytes)
 	pow := math.Floor(math.Log2(math.Abs(rawBytes)) / 10)
-
-	if opts.Separator == "" {
-		opts.Separator = DefaultSeparator
-	}
 
 	if opts.Format == "" {
 		opts.Format = FormatIEC
@@ -80,21 +56,21 @@ func FormatWithOptions(bytes int64, opts Options) string {
 }
 
 func determineMesureUnit(pow float64, format string, base uint) string {
-	stdSuffix := units[int(pow)]
+	stdSuffix := stdUnits[int(pow)]
 
 	if format == FormatIEC {
-		return iecSuffix(stdSuffix, base)
+		return iecSuffix(stdSuffix, base, int(pow))
 	}
 
 	return stdSuffix
 }
 
-func iecSuffix(sf string, base uint) string {
+func iecSuffix(sf string, base uint, pow int) string {
 	if base == BaseDecimal || sf == "B" {
 		return sf
 	}
 
-	return sf[:1] + "i" + sf[1:2]
+	return iecUnits[pow-1]
 }
 
 func toFixed(n float64, precision uint) string {
