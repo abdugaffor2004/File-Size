@@ -79,8 +79,8 @@ fmt.Println(bytes) // Output: 2621440
 
 ```go
 type Options struct {
-    Base      int    // Base for conversion: 1024 (binary) or 1000 (decimal)
-    Precision int    // Number of decimal places to show
+    Base      uint    // Base for conversion: 1024 (binary) or 1000 (decimal)
+    Precision uint    // Number of decimal places to show
     Separator string // Character(s) used to separate number and unit
     Format    string // Output format: "IEC" or "standart"
 }
