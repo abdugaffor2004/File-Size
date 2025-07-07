@@ -9,10 +9,10 @@ import (
 var units = []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 
 // BaseBinary base used for binary-based units like KiB, MiB
-var BaseBinary = 1024
+var BaseBinary uint = 1024
 
 // BaseDecimal base used for decimal-based units like KB, MB
-var BaseDecimal = 1000
+var BaseDecimal uint = 1000
 
 // FormatStandart windows-like standard format using decimal-based units (e.g., KB, MB)
 var FormatStandart = "standart"
@@ -21,7 +21,7 @@ var FormatStandart = "standart"
 var FormatIEC = "IEC"
 
 // DefaultPrecision default number of decimal places used in formatting
-var DefaultPrecision = 1
+var DefaultPrecision uint = 1
 
 // DefaultSeparator default separator between value and unit
 var DefaultSeparator = " "
@@ -29,10 +29,10 @@ var DefaultSeparator = " "
 // Options struct allows customizing the behavior of FormatWithOptions function.
 type Options struct {
 	//Base base for conversion: 1024 or 1000
-	Base int
+	Base uint
 
 	// Precision number of decimal places to show
-	Precision int
+	Precision uint
 
 	// Seperator character(s) used seperate number and unit
 	Separator string
@@ -79,7 +79,7 @@ func FormatWithOptions(bytes int64, opts Options) string {
 	return precised + opts.Separator + unit
 }
 
-func determineMesureUnit(pow float64, format string, base int) string {
+func determineMesureUnit(pow float64, format string, base uint) string {
 	stdSuffix := units[int(pow)]
 
 	if format == FormatIEC {
@@ -89,7 +89,7 @@ func determineMesureUnit(pow float64, format string, base int) string {
 	return stdSuffix
 }
 
-func iecSuffix(sf string, base int) string {
+func iecSuffix(sf string, base uint) string {
 	if base == BaseDecimal || sf == "B" {
 		return sf
 	}
@@ -97,11 +97,11 @@ func iecSuffix(sf string, base int) string {
 	return sf[:1] + "i" + sf[1:2]
 }
 
-func toFixed(n float64, precision int) string {
+func toFixed(n float64, precision uint) string {
 	if n == math.Trunc(n) || precision == 0 {
 		return fmt.Sprintf("%.0f", n)
 	}
-	format := "%." + strconv.Itoa(precision) + "f"
+	format := "%." + strconv.Itoa(int(precision)) + "f"
 
 	return fmt.Sprintf(format, n)
 }
