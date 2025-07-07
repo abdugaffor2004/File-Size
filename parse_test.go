@@ -10,7 +10,7 @@ func TestParse(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    int
+		want    int64
 		wantErr bool
 	}{
 		{
