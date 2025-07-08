@@ -16,47 +16,47 @@ func TestFormat(t *testing.T) {
 		{
 			name:  "Zero value",
 			input: 0,
-			want:  "0B",
+			want:  "0 B",
 		},
 		{
 			name:  "Byte value. More than zero",
 			input: 512,
-			want:  "512B",
+			want:  "512 B",
 		},
 		{
 			name:  "Round KB value in IEC format. ",
 			input: 1024,
-			want:  "1KiB",
+			want:  "1 KiB",
 		},
 		{
 			name:  "non-round KB value in IEC format. ",
 			input: 1536,
-			want:  "1.5KiB",
+			want:  "1.5 KiB",
 		},
 		{
 			name:  "non-round MB value in IEC format. ",
 			input: 1048576,
-			want:  "1MiB",
+			want:  "1 MiB",
 		},
 		{
 			name:  "Negative KB value in IEC format. ",
 			input: -1024,
-			want:  "-1KiB",
+			want:  "-1 KiB",
 		},
 		{
 			name:  "Maximum number",
 			input: math.MaxInt64,
-			want:  "8EiB",
+			want:  "8 EiB",
 		},
 		{
 			name:  "Minimum number",
 			input: math.MinInt64,
-			want:  "-8EiB",
+			want:  "-8 EiB",
 		},
 		{
 			name:  "On the edge",
 			input: 1023,
-			want:  "1023B",
+			want:  "1023 B",
 		},
 	}
 
@@ -78,13 +78,13 @@ func TestFormatWithOptions(t *testing.T) {
 		{
 			name:  "Binary windows-style for (0 < 1000 < 10^6) bytes",
 			input: 1024,
-			opts:  Options{Base: BaseBinary, Format: FormatStandart},
+			opts:  Options{Base: BaseBinary, Format: FormatStandard},
 			want:  "1KB",
 		},
 		{
 			name:  "Binary windows-style for (10^3 < 10^6 < 10^9) bytes",
 			input: 1048576,
-			opts:  Options{Base: BaseBinary, Format: FormatStandart},
+			opts:  Options{Base: BaseBinary, Format: FormatStandard},
 			want:  "1MB",
 		},
 		{
@@ -96,7 +96,7 @@ func TestFormatWithOptions(t *testing.T) {
 		{
 			name:  "Decimal system",
 			input: 1000,
-			opts:  Options{Base: BaseDecimal, Format: FormatStandart},
+			opts:  Options{Base: BaseDecimal, Format: FormatStandard},
 			want:  "1KB",
 		},
 		{

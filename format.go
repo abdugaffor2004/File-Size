@@ -23,19 +23,12 @@ type Options struct {
 
 // Format converts a given number of bytes into a human-readable string using default options.
 func Format(bytes int64) string {
-	return FormatWithOptions(bytes, Options{Base: 1024, Precision: 1, Format: FormatIEC})
+	return FormatWithOptions(bytes, Options{Base: BaseBinary, Precision: 1, Format: FormatIEC, Separator: " "})
 }
 
 // FormatWithOptions converts a given number of bytes into a human-readable string using custom options.
 // Supports different bases (1024/1000), precision levels, separators, and output formats.
 func FormatWithOptions(bytes int64, opts Options) string {
-	if bytes == 0 {
-		return "0" + opts.Separator + "B"
-	}
-
-	rawBytes := float64(bytes)
-	pow := math.Floor(math.Log2(math.Abs(rawBytes)) / 10)
-
 	if opts.Format == "" {
 		opts.Format = FormatIEC
 	}
@@ -44,36 +37,45 @@ func FormatWithOptions(bytes int64, opts Options) string {
 		opts.Base = BaseBinary
 	}
 
+	if bytes == 0 {
+		return "0" + opts.Separator + "B"
+	}
+
+	if math.Abs(float64(bytes)) < float64(opts.Base) {
+		return strconv.Itoa(int(bytes)) + opts.Separator + "B"
+	}
+
+	var pow float64
+	rawBytes := float64(bytes)
+
 	if opts.Base == BaseDecimal {
 		pow = math.Floor(math.Log10(math.Abs(rawBytes)) / 3)
+	} else {
+		pow = math.Floor(math.Log2(math.Abs(rawBytes)) / 10)
 	}
 
 	converted := rawBytes / math.Pow(float64(opts.Base), pow)
-	precised := toFixed(converted, opts.Precision)
-	unit := determineMesureUnit(pow, opts.Format, opts.Base)
+	precised := formatNumber(converted, opts.Precision)
+	unit := determineUnit(pow, opts.Format, opts.Base)
 
 	return precised + opts.Separator + unit
 }
 
-func determineMesureUnit(pow float64, format string, base uint) string {
+func determineUnit(pow float64, format string, base uint) string {
 	stdSuffix := stdUnits[int(pow)]
 
 	if format == FormatIEC {
-		return iecSuffix(stdSuffix, base, int(pow))
+		if base == BaseDecimal {
+			return stdSuffix
+		}
+
+		return iecUnits[int(pow)]
 	}
 
 	return stdSuffix
 }
 
-func iecSuffix(sf string, base uint, pow int) string {
-	if base == BaseDecimal || sf == "B" {
-		return sf
-	}
-
-	return iecUnits[pow-1]
-}
-
-func toFixed(n float64, precision uint) string {
+func formatNumber(n float64, precision uint) string {
 	if n == math.Trunc(n) || precision == 0 {
 		return fmt.Sprintf("%.0f", n)
 	}
