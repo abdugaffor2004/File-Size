@@ -6,6 +6,11 @@ var (
 )
 
 const (
+	logDecimalPow = 3
+	logBinaryPow  = 10
+)
+
+const (
 	// BaseBinary base used for binary-based units like KiB, MiB
 	BaseBinary uint = 1024
 

@@ -3,21 +3,20 @@ package filesize
 import (
 	"fmt"
 	"math"
-	"strconv"
 )
 
 // Options struct allows customizing the behavior of FormatWithOptions function.
 type Options struct {
-	//Base base for conversion: 1024 or 1000
+	// Base base for conversion: 1024 or 1000
 	Base uint
 
 	// Precision number of decimal places to show
 	Precision uint
 
-	// Seperator character(s) used seperate number and unit
+	// Separator character(s) used separate number and unit
 	Separator string
 
-	// Format output in standart or IEC format
+	// Format output in standard or IEC format
 	Format string
 }
 
@@ -41,45 +40,42 @@ func FormatWithOptions(bytes int64, opts Options) string {
 		return "0" + opts.Separator + "B"
 	}
 
-	if math.Abs(float64(bytes)) < float64(opts.Base) {
-		return strconv.Itoa(int(bytes)) + opts.Separator + "B"
-	}
-
 	var pow float64
 	rawBytes := float64(bytes)
+	absBytes := math.Abs(rawBytes)
 
-	if opts.Base == BaseDecimal {
-		pow = math.Floor(math.Log10(math.Abs(rawBytes)) / 3)
-	} else {
-		pow = math.Floor(math.Log2(math.Abs(rawBytes)) / 10)
+	if absBytes >= float64(opts.Base) {
+		if opts.Base == BaseDecimal {
+			pow = math.Floor(math.Log10(absBytes) / logDecimalPow)
+		} else {
+			pow = math.Floor(math.Log2(absBytes) / logBinaryPow)
+		}
 	}
 
 	converted := rawBytes / math.Pow(float64(opts.Base), pow)
-	precised := formatNumber(converted, opts.Precision)
+	formatted := formatNumber(converted, opts.Precision)
 	unit := determineUnit(pow, opts.Format, opts.Base)
 
-	return precised + opts.Separator + unit
+	return formatted + opts.Separator + unit
 }
 
 func determineUnit(pow float64, format string, base uint) string {
-	stdSuffix := stdUnits[int(pow)]
+	index := int(pow)
 
-	if format == FormatIEC {
-		if base == BaseDecimal {
-			return stdSuffix
-		}
-
-		return iecUnits[int(pow)]
+	switch {
+	case format == FormatIEC && base != BaseDecimal:
+		return iecUnits[index]
+	default:
+		return stdUnits[index]
 	}
-
-	return stdSuffix
 }
 
 func formatNumber(n float64, precision uint) string {
 	if n == math.Trunc(n) || precision == 0 {
 		return fmt.Sprintf("%.0f", n)
 	}
-	format := "%." + strconv.Itoa(int(precision)) + "f"
+
+	format := fmt.Sprintf("%%.%df", precision)
 
 	return fmt.Sprintf(format, n)
 }
