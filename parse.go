@@ -28,7 +28,7 @@ func Parse(s string) (int64, error) {
 			break
 		}
 
-		if iecCutted, ok := strings.CutSuffix(prepared, strings.ToUpper(determineUnit(float64(i+1), FormatIEC, BaseBinary))); ok {
+		if iecCutted, ok := strings.CutSuffix(prepared, strings.ToUpper(determineUnit(float64(i+1), FormatIEC))); ok {
 			rawBytes = calcRawBytes(iecCutted, i+1)
 			break
 		}

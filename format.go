@@ -54,16 +54,16 @@ func FormatWithOptions(bytes int64, opts Options) string {
 
 	converted := rawBytes / math.Pow(float64(opts.Base), pow)
 	formatted := formatNumber(converted, opts.Precision)
-	unit := determineUnit(pow, opts.Format, opts.Base)
+	unit := determineUnit(pow, opts.Format)
 
 	return formatted + opts.Separator + unit
 }
 
-func determineUnit(pow float64, format string, base uint) string {
+func determineUnit(pow float64, format string) string {
 	index := int(pow)
 
-	switch {
-	case format == FormatIEC && base != BaseDecimal:
+	switch format {
+	case FormatIEC:
 		return iecUnits[index]
 	default:
 		return stdUnits[index]

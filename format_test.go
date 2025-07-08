@@ -103,7 +103,7 @@ func TestFormatWithOptions(t *testing.T) {
 			name:  "Decimal system IEC format",
 			input: 1000,
 			opts:  Options{Base: BaseDecimal, Format: FormatIEC},
-			want:  "1KB",
+			want:  "1KiB",
 		},
 		{
 			name:  "Precision up to 0 with rounding",
@@ -129,12 +129,6 @@ func TestFormatWithOptions(t *testing.T) {
 			opts:  Options{Separator: " "},
 			want:  "1 KiB",
 		},
-		// {
-		// 	name: "Without separator",
-		// 	input: 1024,
-		// 	opts: Options{Separator: ""},
-		// 	want: "1KiB",
-		// },
 		{
 			name:  "Underscore separator",
 			input: 1024,
