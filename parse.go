@@ -34,8 +34,8 @@ func Parse(s string) (int64, error) {
 func parseWithUnits(s string, units [7]string) (int64, bool) {
 	for i, unit := range units {
 		upperedUnit := strings.ToUpper(unit)
-		if stdCutted, ok := strings.CutSuffix(s, upperedUnit); ok {
-			bytes, err := convertToBytes(stdCutted, i)
+		if cutted, ok := strings.CutSuffix(s, upperedUnit); ok {
+			bytes, err := convertToBytes(cutted, i)
 			if err != nil {
 				continue
 			}
