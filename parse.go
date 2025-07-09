@@ -32,29 +32,11 @@ func Parse(s string) (int64, error) {
 	return 0, errors.New("invalid input")
 }
 
-func calcRawBytes(bytes string, i int) (int64, error) {
-	trimmed := strings.TrimSpace(bytes)
-	convedBytes, err := strconv.ParseFloat(trimmed, 64)
-	pow := float64(i)
-	rawBytes := int64(convedBytes * math.Pow(float64(BaseBinary), pow))
-
-	if err != nil {
-		return 0, err
-	}
-
-	return rawBytes, nil
-}
-
-func parseNumber(s string) (int64, bool) {
-	bytes, err := strconv.ParseInt(s, 10, 64)
-
-	return bytes, err == nil
-}
-
 func parseWithUnits(s string, units [7]string) (int64, bool) {
 	for i, unit := range units {
 		if stdCutted, ok := strings.CutSuffix(s, strings.ToUpper(unit)); ok {
 			bytes, err := calcRawBytes(stdCutted, i)
+
 			if err != nil {
 				continue
 			}
@@ -64,4 +46,24 @@ func parseWithUnits(s string, units [7]string) (int64, bool) {
 	}
 
 	return 0, false
+}
+
+func calcRawBytes(bytes string, i int) (int64, error) {
+	trimmed := strings.TrimSpace(bytes)
+	convedBytes, err := strconv.ParseFloat(trimmed, 64)
+
+	if err != nil {
+		return 0, err
+	}
+
+	pow := float64(i)
+	rawBytes := int64(convedBytes * math.Pow(float64(BaseBinary), pow))
+
+	return rawBytes, nil
+}
+
+func parseNumber(s string) (int64, bool) {
+	bytes, err := strconv.ParseInt(s, 10, 64)
+
+	return bytes, err == nil
 }

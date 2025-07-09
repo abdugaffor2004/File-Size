@@ -5,6 +5,11 @@ import (
 	"math"
 )
 
+const (
+	logDecimalPow = 3
+	logBinaryPow  = 10
+)
+
 // Options struct allows customizing the behavior of FormatWithOptions function.
 type Options struct {
 	// Base base for conversion: 1024 or 1000
@@ -40,9 +45,9 @@ func FormatWithOptions(bytes int64, opts Options) string {
 		return "0" + opts.Separator + "B"
 	}
 
-	var pow float64
 	rawBytes := float64(bytes)
 	absBytes := math.Abs(rawBytes)
+	var pow float64
 
 	if absBytes >= float64(opts.Base) {
 		if opts.Base == BaseDecimal {
@@ -60,14 +65,13 @@ func FormatWithOptions(bytes int64, opts Options) string {
 }
 
 func determineUnit(pow float64, format string) string {
-	index := int(pow)
+	powIdx := int(pow)
 
-	switch format {
-	case FormatIEC:
-		return iecUnits[index]
-	default:
-		return stdUnits[index]
+	if format == FormatIEC {
+		return iecUnits[powIdx]
 	}
+
+	return stdUnits[powIdx]
 }
 
 func formatNumber(n float64, precision uint) string {
