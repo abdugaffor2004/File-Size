@@ -47,8 +47,8 @@ func FormatWithOptions(bytes int64, opts Options) string {
 
 	rawBytes := float64(bytes)
 	absBytes := math.Abs(rawBytes)
-	var pow float64
 
+	var pow float64
 	if absBytes >= float64(opts.Base) {
 		if opts.Base == BaseDecimal {
 			pow = math.Floor(math.Log10(absBytes) / logDecimalPow)
@@ -66,7 +66,6 @@ func FormatWithOptions(bytes int64, opts Options) string {
 
 func determineUnit(pow float64, format string) string {
 	powIdx := int(pow)
-
 	if format == FormatIEC {
 		return iecUnits[powIdx]
 	}

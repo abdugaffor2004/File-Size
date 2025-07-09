@@ -12,7 +12,6 @@ import (
 // Returns an error if input is invalid or cannot be parsed.
 func Parse(s string) (int64, error) {
 	prepared := strings.ToUpper(strings.TrimSpace(s))
-
 	if prepared == "" {
 		return 0, errors.New("empty input")
 	}
@@ -21,12 +20,12 @@ func Parse(s string) (int64, error) {
 		return bytes, nil
 	}
 
-	if rawBytes, ok := parseWithUnits(prepared, stdUnits); ok {
-		return rawBytes, nil
+	if bytes, ok := parseWithUnits(prepared, stdUnits); ok {
+		return bytes, nil
 	}
 
-	if rawBytes, ok := parseWithUnits(prepared, iecUnits); ok {
-		return rawBytes, nil
+	if bytes, ok := parseWithUnits(prepared, iecUnits); ok {
+		return bytes, nil
 	}
 
 	return 0, errors.New("invalid input")
@@ -35,8 +34,7 @@ func Parse(s string) (int64, error) {
 func parseWithUnits(s string, units [7]string) (int64, bool) {
 	for i, unit := range units {
 		if stdCutted, ok := strings.CutSuffix(s, strings.ToUpper(unit)); ok {
-			bytes, err := calcRawBytes(stdCutted, i)
-
+			bytes, err := convertToBytes(stdCutted, i)
 			if err != nil {
 				continue
 			}
@@ -48,18 +46,20 @@ func parseWithUnits(s string, units [7]string) (int64, bool) {
 	return 0, false
 }
 
-func calcRawBytes(bytes string, i int) (int64, error) {
-	trimmed := strings.TrimSpace(bytes)
-	convedBytes, err := strconv.ParseFloat(trimmed, 64)
+func convertToBytes(numStr string, i int) (int64, error) {
+	trimmed := strings.TrimSpace(numStr)
+	if trimmed == "" {
+		return 0, errors.New("empty input")
+	}
 
+	convedBytes, err := strconv.ParseFloat(trimmed, 64)
 	if err != nil {
 		return 0, err
 	}
 
-	pow := float64(i)
-	rawBytes := int64(convedBytes * math.Pow(float64(BaseBinary), pow))
+	rawBytes := convedBytes * math.Pow(float64(BaseBinary), float64(i))
 
-	return rawBytes, nil
+	return int64(rawBytes), nil
 }
 
 func parseNumber(s string) (int64, bool) {
