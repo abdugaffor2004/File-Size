@@ -33,7 +33,8 @@ func Parse(s string) (int64, error) {
 
 func parseWithUnits(s string, units [7]string) (int64, bool) {
 	for i, unit := range units {
-		if stdCutted, ok := strings.CutSuffix(s, strings.ToUpper(unit)); ok {
+		upperedUnit := strings.ToUpper(unit)
+		if stdCutted, ok := strings.CutSuffix(s, upperedUnit); ok {
 			bytes, err := convertToBytes(stdCutted, i)
 			if err != nil {
 				continue
@@ -46,10 +47,10 @@ func parseWithUnits(s string, units [7]string) (int64, bool) {
 	return 0, false
 }
 
-func convertToBytes(numStr string, i int) (int64, error) {
+func convertToBytes(numStr string, pow int) (int64, error) {
 	trimmed := strings.TrimSpace(numStr)
 	if trimmed == "" {
-		return 0, errors.New("empty input")
+		return 0, errors.New("empty number")
 	}
 
 	convedBytes, err := strconv.ParseFloat(trimmed, 64)
@@ -57,7 +58,7 @@ func convertToBytes(numStr string, i int) (int64, error) {
 		return 0, err
 	}
 
-	rawBytes := convedBytes * math.Pow(float64(BaseBinary), float64(i))
+	rawBytes := convedBytes * math.Pow(float64(BaseBinary), float64(pow))
 
 	return int64(rawBytes), nil
 }

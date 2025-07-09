@@ -66,11 +66,12 @@ func FormatWithOptions(bytes int64, opts Options) string {
 
 func determineUnit(pow float64, format string) string {
 	powIdx := int(pow)
+
 	if format == FormatIEC {
 		return iecUnits[powIdx]
+	} else {
+		return stdUnits[powIdx]
 	}
-
-	return stdUnits[powIdx]
 }
 
 func formatNumber(n float64, precision uint) string {
