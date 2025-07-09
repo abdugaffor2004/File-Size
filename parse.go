@@ -11,50 +11,57 @@ import (
 // Supports both IEC (KiB, MiB) and SI (KB, MB) formats with appropriate bases.
 // Returns an error if input is invalid or cannot be parsed.
 func Parse(s string) (int64, error) {
-	var rawBytes int64
 	prepared := strings.ToUpper(strings.TrimSpace(s))
 
 	if prepared == "" {
 		return 0, errors.New("empty input")
 	}
 
-	if bytes, ok := isBytes(prepared); ok {
+	if bytes, ok := parseNumber(prepared); ok {
 		return bytes, nil
 	}
 
-	for i, sfx := range stdUnits[1:] {
-		if stdCutted, ok := strings.CutSuffix(prepared, sfx); ok {
-			rawBytes = calcRawBytes(stdCutted, i+1)
-			break
-		}
-
-		if iecCutted, ok := strings.CutSuffix(prepared, strings.ToUpper(determineUnit(float64(i+1), FormatIEC))); ok {
-			rawBytes = calcRawBytes(iecCutted, i+1)
-			break
-		}
+	if rawBytes, ok := parseWithUnits(prepared, stdUnits); ok {
+		return rawBytes, nil
 	}
 
-	if cutted, ok := strings.CutSuffix(prepared, "B"); rawBytes == 0 && ok {
-		rawBytes = calcRawBytes(cutted, 0)
+	if rawBytes, ok := parseWithUnits(prepared, iecUnits); ok {
+		return rawBytes, nil
 	}
 
-	if rawBytes == 0 {
-		return 0, errors.New("invalid input")
+	return 0, errors.New("invalid input")
+}
+
+func calcRawBytes(bytes string, i int) (int64, error) {
+	trimmed := strings.TrimSpace(bytes)
+	convedBytes, err := strconv.ParseFloat(trimmed, 64)
+	pow := float64(i)
+	rawBytes := int64(convedBytes * math.Pow(float64(BaseBinary), pow))
+
+	if err != nil {
+		return 0, err
 	}
 
 	return rawBytes, nil
 }
 
-func calcRawBytes(bytes string, i int) (rawBytes int64) {
-	trimmed := strings.TrimSpace(bytes)
-	convedBytes, _ := strconv.ParseFloat(trimmed, 32)
-	pow := float64(i)
-	rawBytes = int64(convedBytes * math.Pow(float64(BaseBinary), pow))
+func parseNumber(s string) (int64, bool) {
+	bytes, err := strconv.ParseInt(s, 10, 64)
 
-	return
+	return bytes, err == nil
 }
 
-func isBytes(s string) (int64, bool) {
-	bytes, err := strconv.ParseInt(s, 10, 64)
-	return bytes, err == nil
+func parseWithUnits(s string, units [7]string) (int64, bool) {
+	for i, unit := range units {
+		if stdCutted, ok := strings.CutSuffix(s, strings.ToUpper(unit)); ok {
+			bytes, err := calcRawBytes(stdCutted, i)
+			if err != nil {
+				continue
+			}
+
+			return bytes, true
+		}
+	}
+
+	return 0, false
 }
