@@ -15,7 +15,7 @@ A lightweight Go package for converting between bytes and human-readable file si
 ## Installation
 
 ```bash
-go get github.com/abdugaffor2004/filesize
+go get github.com/haadi-coder/filesize
 ```
 
 ## Usage
@@ -27,7 +27,7 @@ package main
 
 import (
     "fmt"
-    "github.com/abdugaffor2004/filesize"
+    "github.com/haadi-coder/filesize"
 )
 
 func main() {
