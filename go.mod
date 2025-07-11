@@ -1,4 +1,4 @@
-module github.com/abdugaffor2004/File-Size
+module github.com/haadi-coder/File-Size
 
 go 1.24.4
 
