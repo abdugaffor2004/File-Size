@@ -1,4 +1,4 @@
-module github.com/haadi-coder/File-Size
+module github.com/haadi-coder/filesize
 
 go 1.24.4
 
